@@ -12,8 +12,10 @@ import android.os.ResultReceiver;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.inputmethod.CompletionInfo;
+import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
 import com.google.common.base.Optional;
+import java.util.List;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Implementation;
 import org.robolectric.annotation.Implements;
@@ -43,6 +45,7 @@ public class ShadowInputMethodManager {
 
   private boolean softInputVisible;
   private Optional<SoftInputVisibilityChangeHandler> visibilityChangeHandler = Optional.absent();
+  private List<InputMethodInfo> inputMethodInfoList;
 
   @Implementation
   protected boolean showSoftInput(View view, int flags) {
@@ -100,6 +103,15 @@ public class ShadowInputMethodManager {
     if (visibilityChangeHandler.isPresent()) {
       visibilityChangeHandler.get().handleSoftInputVisibilityChange(softInputVisible);
     }
+  }
+
+  @Implementation
+  public List<InputMethodInfo> getEnabledInputMethodList() {
+    return inputMethodInfoList;
+  }
+
+  public void setInputMethodInfoList(List<InputMethodInfo> inputMethodInfoList) {
+    this.inputMethodInfoList = inputMethodInfoList;
   }
 
   @Implementation
@@ -170,13 +182,16 @@ public class ShadowInputMethodManager {
 
   @ForType(InputMethodManager.class)
   interface _InputMethodManager_ {
-    @Static @Accessor("mInstance")
+    @Static
+    @Accessor("mInstance")
     void setMInstance(InputMethodManager instance);
 
-    @Static @Accessor("sInstance")
+    @Static
+    @Accessor("sInstance")
     void setInstance(InputMethodManager instance);
 
-    @Static @Accessor("sInstanceMap")
+    @Static
+    @Accessor("sInstanceMap")
     SparseArray<InputMethodManager> getInstanceMap();
   }
 }
